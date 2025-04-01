@@ -9,7 +9,7 @@ const argv = yargs
     alias: "u",
     description: "URL to fetch responses from",
     type: "string",
-    default: "https://www.example.com",
+    required: true,
   })
   .option("output-dir", {
     alias: "o",
@@ -22,6 +22,12 @@ const argv = yargs
     type: "boolean",
     default: true,
   })
+  .option("session-name", {
+    alias: "s",
+    description: "Session name",
+    type: "string",
+    default: "session",
+  })
   .help().argv;
 
 console.log(`Fetching from ${argv.url}`);
@@ -29,6 +35,7 @@ console.log(`Fetching from ${argv.url}`);
 const outputDir = argv["output-dir"];
 const headless = argv.headless;
 const domain = argv.url.split("/")[2];
+const sessionName = argv["session-name"];
 
 // Sanitize filename and truncate
 const safeFilename = (url) =>
@@ -62,7 +69,7 @@ function createAuthCookie(name, value) {
 
   const browser = await chromium.launch({ headless: headless });
   const context = await browser.newContext();
-  await context.addCookies([createAuthCookie("session", session)]);
+  await context.addCookies([createAuthCookie(sessionName, session)]);
 
   const page = await context.newPage();
 
